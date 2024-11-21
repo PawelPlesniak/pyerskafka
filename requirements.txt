@@ -1,0 +1,6 @@
+gitpython
+rich
+click
+kafka
+ers
+googleapis-common-protos
