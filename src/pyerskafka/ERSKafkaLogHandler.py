@@ -1,5 +1,4 @@
-from erskafka.ERSPublisher import ERSPublisher, ERSException, SeverityLevel  # import the custom exception and the SeverityLevel enum
-#import erskafka.ERSPublisher as erspub
+from erskafka.ERSPublisher import ERSPublisher, SeverityLevel  # import the custom exception and the SeverityLevel enum
 import logging
 import os
 
@@ -14,7 +13,8 @@ class ERSKafkaLogHandler(logging.Handler):
     Note 2: IMPORTANT!! you MUST NOT use this handler on the root logger. Use it on a logger that you have created yourself (this is because the root logger is used by Kafka, and it creates a circular dependency).
 
     Example:
-    ```python
+    ```
+    python
     import logging
     from erskafka.ERSKafkaLogHandler import ERSKafkaLogHandler
 

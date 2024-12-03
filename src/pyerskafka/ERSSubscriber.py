@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import ers.issue_pb2 as ersissue
+import google.protobuf.message as msg
+
 from kafka import KafkaConsumer
 import json
 import threading 
@@ -8,9 +11,6 @@ import os
 import re
 import logging
 import getpass
-
-import ers.issue_pb2 as ersissue
-import google.protobuf.message as msg
 
 class  ERSSubscriber:
     def __init__(self, config) :

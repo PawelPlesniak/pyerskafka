@@ -1,11 +1,10 @@
-import os
-import socket
-import inspect
 import ers.issue_pb2 as ersissue
 from datetime import datetime
-from kafka import KafkaProducer
-import time
 from enum import IntEnum, auto
+from kafka import KafkaProducer
+import os
+import socket
+import time
 from typing import Union, Optional
 
 class SeverityLevel(IntEnum):
