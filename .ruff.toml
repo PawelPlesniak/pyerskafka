@@ -3,3 +3,4 @@ exclude = ["tests/*"]
 [lint]
 ignore = ["ALL"]
 select = ["F821"]
+# TODO: check if select all or whatever the option is
