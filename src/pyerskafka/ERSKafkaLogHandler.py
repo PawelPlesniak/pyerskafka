@@ -1,6 +1,8 @@
-from erskafka.ERSPublisher import ERSPublisher, SeverityLevel  # import the custom exception and the SeverityLevel enum
 import logging
 import os
+
+from pyerskafka.ERSPublisher import ERSPublisher, SeverityLevel  # import the custom exception and the SeverityLevel enum
+
 
 class ERSKafkaLogHandlerOnRootLogger(Exception):
     pass
