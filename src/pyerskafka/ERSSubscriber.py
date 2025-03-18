@@ -1,16 +1,13 @@
-#!/usr/bin/env python3
-
-import ers.issue_pb2 as ersissue
+import getpass
 import google.protobuf.message as msg
-
 from kafka import KafkaConsumer
-import json
-import threading 
-import socket
 import os
 import re
-import logging
-import getpass
+import socket
+import threading 
+
+import ers.issue_pb2 as ersissue
+
 
 class  ERSSubscriber:
     def __init__(self, config) :
@@ -23,8 +20,6 @@ class  ERSSubscriber:
         self.running = False
         self.functions = dict()
         self.thread = threading.Thread(target=self.message_loop)
-
-                        
     #    print("From Kafka server:",bootstrap)
 
     def default_id(self) -> str:  
@@ -35,7 +30,7 @@ class  ERSSubscriber:
         id = "{}-{}-{}-{}".format(node, user, process, thread)
         return id
            
-    def add_callback(self, function, name, selection  = '.*') -> bool:
+    def add_callback(self, function, name, selection='.*') -> bool:
         if ( name in self.functions ) : return False
        
         was_running = self.running
@@ -53,7 +48,7 @@ class  ERSSubscriber:
         self.functions.clear()
 
     def remove_callback(self, name) -> bool:
-        if ( name not in sef.functions.keys() ) : return False
+        if ( name not in self.functions.keys() ) : return False
 
         was_running = self.running
         if (was_running) : self.stop()
@@ -62,6 +57,7 @@ class  ERSSubscriber:
 
         if ( was_running and len(self.functions)>0 ) : self.start()
         return True
+
     def start(self):
         print("Starting run")
         self.running = True
@@ -108,6 +104,4 @@ class  ERSSubscriber:
                 print(e)
 
         print ("Stop")
-
-
-        
+    

@@ -5,6 +5,5 @@ setup(
     name="pyerskafka",
     install_requires=[
     ],
-    extras_require={"develop": [
-    ]},
+    extras_require={"develop": ["ipdb", "ipython", "ruff", "pre-commit", "pytest"]},
 )

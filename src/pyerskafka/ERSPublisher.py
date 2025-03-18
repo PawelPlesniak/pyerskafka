@@ -1,11 +1,14 @@
-import ers.issue_pb2 as ersissue
 from datetime import datetime
 from enum import IntEnum, auto
 from kafka import KafkaProducer
 import os
+import inspect
 import socket
 import time
 from typing import Union, Optional
+
+import ers.issue_pb2 as ersissue
+
 
 class SeverityLevel(IntEnum):
     DEBUG = auto()
@@ -18,10 +21,10 @@ class SeverityLevel(IntEnum):
 class ERSPublisher:
     def __init__(
         self,
-        bootstrap:str = "monkafka.cern.ch:30092",
-        topic:str = "ers_stream",
-        application_name:str = "python",
-        package_name:str = "unknown"
+        bootstrap:str,
+        topic:str,
+        application_name:str,
+        package_name:str
     ):
         self.application_name = application_name
         self.package_name = package_name
@@ -44,10 +47,10 @@ class ERSPublisher:
     def publish(
         self,
         message_or_exception:Union[str,Exception],
-        severity:SeverityLevel = SeverityLevel.INFO.name,
-        name:Optional[str] = None,
-        cause:Union[None, Exception, ersissue.IssueChain, ersissue.SimpleIssue] = None,
-        context_kwargs:Optional[dict] = None,
+        severity:SeverityLevel=SeverityLevel.INFO.name,
+        name:Optional[str]=None,
+        cause:Union[None, Exception, ersissue.IssueChain, ersissue.SimpleIssue]=None,
+        context_kwargs:Optional[dict]=None,
     ):
         """Create and issue from text or exception and send to to the Kafka."""
 
@@ -61,10 +64,10 @@ class ERSPublisher:
 
         issue_chain = self._create_issue_chain(
             message_or_exception,
-            name = name,
-            severity = severity,
-            cause = cause,
-            context_kwargs = context_kwargs,
+            name=name,
+            severity=severity,
+            cause=cause,
+            context_kwargs=context_kwargs,
         )
         return self._publish_issue_chain(issue_chain)
 
@@ -75,7 +78,7 @@ class ERSPublisher:
 
     def _generate_context(
         self,
-        context_kwargs:Optional[dict] = None,
+        context_kwargs:Optional[dict]=None,
     ) -> ersissue.Context:
 
         """Generate the context for an issue."""
@@ -94,14 +97,14 @@ class ERSPublisher:
             frame = inspect.currentframe()
 
         context = dict( # A guess for the context
-            cwd = os.getcwd(),
-            file_name = frame.f_code.co_filename,
-            function_name = frame.f_code.co_name,
-            host_name = socket.gethostname(),
-            line_number = frame.f_lineno,
-            user_name = os.getlogin(),
-            package_name = self.package_name,
-            application_name = self.application_name,
+            cwd=os.getcwd(),
+            file_name=frame.f_code.co_filename,
+            function_name=frame.f_code.co_name,
+            host_name=socket.gethostname(),
+            line_number=frame.f_lineno,
+            user_name=os.getlogin(),
+            package_name=self.package_name,
+            application_name=self.application_name,
         )
 
         if context_kwargs:
@@ -112,8 +115,8 @@ class ERSPublisher:
     def _exception_to_issue(
         self,
         exc:Exception,
-        severity:SeverityLevel = SeverityLevel.WARNING.name,
-        context_kwargs:Optional[dict] = None,
+        severity:SeverityLevel=SeverityLevel.WARNING.name,
+        context_kwargs:Optional[dict]=None,
     ) -> ersissue.SimpleIssue:
 
         """Converts an exception to a SimpleIssue."""
@@ -133,10 +136,10 @@ class ERSPublisher:
     def _create_issue_chain(
         self,
         message:Union[Exception,str],
-        name:str = "GenericPythonIssue",
-        severity:SeverityLevel = SeverityLevel.INFO.name,
-        cause:Union[Exception,ersissue.SimpleIssue,ersissue.IssueChain] = None,
-        context_kwargs:Optional[dict] = None,
+        name:str="GenericPythonIssue",
+        severity:SeverityLevel=SeverityLevel.INFO.name,
+        cause:Union[Exception,ersissue.SimpleIssue,ersissue.IssueChain]=None,
+        context_kwargs:Optional[dict]=None,
     ):
         """Create an ERS IssueChain with minimal user input."""
         # This creates an issue chain with a given name, message, and severity
@@ -187,12 +190,3 @@ class ERSPublisher:
         """Destructor-like method to clean up resources."""
         if self.producer:
             self.producer.close()
-
-
-class ERSException(Exception):
-    """Custom exception which can also be treated as an ERS issue."""
-
-    def __init__(self, message):
-        super().__init__(message)
-        self.message = message
-
